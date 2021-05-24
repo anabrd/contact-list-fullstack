@@ -65,7 +65,7 @@ function Card({contact, deleteContact, message, setMessage}) {
     return (
         <div className={message ? "card card-animate" : "card"} style={{backgroundColor: bgColor}}>
             <div 
-            className="image" style={{backgroundImage: `url(${imgPath})`}}>
+            className="image" style={{backgroundImage: `url(${imgPath})`, backgroundSize: "cover"}}>
                 {isEditable ? "↑" : null}
             </div>
             <section className="card-content">

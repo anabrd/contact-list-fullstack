@@ -67,77 +67,68 @@ function App() {
     localStorage.setItem("contact", JSON.stringify(newForm));
   }
 
-  const formSubmitHandler = (e) => {
-    e.preventDefault();
-    const url = 'http://localhost:8080/contacts/new';
-    const options = {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(form)
-    }
-    fetch(url, options)
-    .then(data => data.json().then(output => {
+  // old addcontact form
+  // const formSubmitHandler = (e) => {
+  //   e.preventDefault();
+  //   const url = 'http://localhost:8080/contacts/new';
+  //   const options = {
+  //     method: 'POST',
+  //     headers: {
+  //       'Content-Type': 'application/json'
+  //     },
+  //     body: JSON.stringify(form)
+  //   }
+  //   fetch(url, options)
+  //   .then(data => data.json().then(output => {
     
-      if (output.status == "success") {
-        setMessage(output.message);
-        setTimeout(()=> setMessage(null), 3000);
-        setContacts([...contacts, form])
-      } else {
-        setMessage(output.message);
-        setTimeout(()=> setMessage(null), 3000);
-        console.log(output.message);
-      }}))
-  };
-
-      // change picture
+  //     if (output.status == "success") {
+  //       setMessage(output.message);
+  //       setTimeout(()=> setMessage(null), 3000);
+  //       setContacts([...contacts, form])
+  //     } else {
+  //       setMessage(output.message);
+  //       setTimeout(()=> setMessage(null), 3000);
+  //       console.log(output.message);
+  //     }}))
+  // };
 
   const changePicture = (e) => {
         setPicture(e.target.files[0]);
-        console.log(e.target.files[0])
-        console.log(picture)
   }
 
-  const addPicture = (e)=>{
+  const addContact = (e) => {
         e.preventDefault();
-        console.log(picture);
-        // collect all data from form
-        console.log(form.fullName)
-        const formData = new FormData(); // create instance of a object for html form
-        formData.append('contactPic', picture);// add plant picture to formData object
+      
+        const formData = new FormData();
+        formData.append('contactPic', picture);
         formData.append('fullName', form.fullName);
         formData.append('email', form.email);
         formData.append('phone', form.phone);
         formData.append('address', form.address);
-        console.log(formData)
-        const url = 'http://localhost:8080/contacts/picture';
+
+        const url = 'http://localhost:8080/contacts/add';
         const options = {
         method: 'POST',
-        // headers: {
-        //     'Content-Type': 'multipart/form-data'
-        // },
         body: formData
         }
 
         fetch(url, options)
-        // .then(data => data.json().then(output => {
-        //     if (output.status === "success") {
-        //         setIsEditable(false);
-        //         setMessage(output.message);
-        //         setBgColor("white")
-        //         setTimeout(()=> setMessage(null), 3000);
-        //     } else {
-        //         setBgColor("coral");
-        //     }
-        // }))
+        .then(data => data.json().then(output => {
+            if (output.status === "success") {
+                setMessage(output.message);
+                setTimeout(()=> setMessage(null), 3000);
+                setContacts([...contacts, output.data])
+            } else {
+                setMessage(output.message)
+            }
+        }))
     }
 
 
   return (
     <div className="App">
       <section>
-        <form className="form" onSubmit = {addPicture}>
+        <form className="form" onSubmit = {addContact}>
           <h1>Contacts</h1>
           <input type="text" placeholder="Full Name" value= {form.fullName} required onChange = {(e) => fillForm(e, 'fullName')}/>
           <input type="email" placeholder="Email" value= {form.email} onChange = {(e) => fillForm(e, 'email')}/>

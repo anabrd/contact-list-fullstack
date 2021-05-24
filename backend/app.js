@@ -34,14 +34,12 @@ app.use(allowCrossDomain);
 
 app.use(express.static(path.join(__dirname, '/public')));
 
-// app.use('/public/images', express.static(process.cwd() + '/public/images'));
-
 // Routes
 app.use('/contacts', contacts);
 
 app.listen(port, () => (console.log(`Server started to run on port ${port}.`)));
 
-app.post('/contacts/picture', upload.single('contactPic'), (req, res) => {
+app.post('/contacts/add', upload.single('contactPic'), (req, res) => {
     console.log("request body", req.body, req.file)
     let newContact = new contactsModel({
         fullName: req.body.fullName,
@@ -52,8 +50,11 @@ app.post('/contacts/picture', upload.single('contactPic'), (req, res) => {
     })
     console.log("newContact", newContact)
     newContact.save((err, doc)=>{
-        console.log("added contact with pi")
-        res.json('A new contact has been added!')
+        if (err) {
+            res.send({status:"failed", message:"Something went wrong."})
+        } else {
+            res.send({status:"success", message:"New contact added.", data: doc})
+        }
     })
 }
 )
