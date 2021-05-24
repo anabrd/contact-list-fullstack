@@ -2,7 +2,6 @@ const express = require('express');
 require('dotenv').config();
 const contacts = require('./router/contacts');
 const connectDB = require('./config/db');
-const path = require('path');
 const app = express();
 const port = process.env.PORT || 8080;
 const multer = require('multer');
@@ -32,7 +31,7 @@ let allowCrossDomain = function(req, res, next) {
 
 app.use(allowCrossDomain);
 
-app.use(express.static(path.join(__dirname, '/public')));
+app.use(express.static(__dirname + '/public'));
 
 // Routes
 app.use('/contacts', contacts);

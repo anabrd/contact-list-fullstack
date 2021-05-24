@@ -5,7 +5,6 @@ require('mongoose').Promise = global.Promise;
 exports.newPost = async (req, res) =>
     {
         // add a new contact to db
-
         const newContact = new contacts(req.body);
         console.log("log id from new contact", req.logId)
         // Bulent's code
