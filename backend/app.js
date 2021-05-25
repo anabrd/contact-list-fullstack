@@ -6,6 +6,7 @@ const app = express();
 const port = process.env.PORT || 8080;
 const multer = require('multer');
 const contactsModel = require('./model/contacts');
+const auth = require('./router/auth')
 
 const storage = multer.diskStorage({
     destination: function(req, file, callback) {
@@ -57,3 +58,5 @@ app.post('/contacts/add', upload.single('contactPic'), (req, res) => {
     })
 }
 )
+
+app.use('/auth', auth)
