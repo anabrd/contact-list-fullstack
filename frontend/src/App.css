@@ -116,6 +116,13 @@ input[type="file"] {
     height: 190px;
 }
 
+.auth {
+  border: 1px solid #0a92a4;
+  border-radius: 10px;
+  margin: auto;
+  height: 250px;
+}
+
 .buttons-wrapper {
   display: flex;
   justify-content: space-evenly;

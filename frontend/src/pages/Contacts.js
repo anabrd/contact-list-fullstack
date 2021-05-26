@@ -17,7 +17,12 @@ useEffect(() => {
 
     useEffect(() => {
     const url = 'http://localhost:8080/contacts/all';
-    fetch(url).then(data => data.json().then(
+    const options = {
+        headers: {
+            'x-auth-token': localStorage.getItem('token')
+        }
+    }
+    fetch(url, options).then(data => data.json().then(
         contacts => setContacts(contacts)))
     }, []);
 

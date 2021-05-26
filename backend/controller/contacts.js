@@ -67,7 +67,6 @@ exports.deleteContact = (req, res) => {
 
 exports.updateContact = async (req,res) => {
     const contact = req.body
-    console.log(contact, )
     console.log(req.logId, "in update")
     // You have to add a runValidators object because otherwise the validation won't happen
     contacts.findByIdAndUpdate(contact._id, contact, {upsert: true, runValidators: true}, (err,doc)=>{
@@ -106,9 +105,4 @@ exports.updateContact = async (req,res) => {
             // res.send({status: "success", message: "Contact updated successfully!"})
     //     }
     // })
-}
-
-exports.addPicture = (req, res) => {
-    const picture = req.body
-    console.log(req.body, "picture file")
 }

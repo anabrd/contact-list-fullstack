@@ -6,7 +6,8 @@ const app = express();
 const port = process.env.PORT || 8080;
 const multer = require('multer');
 const contactsModel = require('./model/contacts');
-const auth = require('./router/auth')
+const auth = require('./router/auth');
+const authMid = require('./middleware/auth')
 
 const storage = multer.diskStorage({
     destination: function(req, file, callback) {
@@ -38,6 +39,8 @@ app.use(express.static(__dirname + '/public'));
 app.use('/contacts', contacts);
 
 app.listen(port, () => (console.log(`Server started to run on port ${port}.`)));
+
+app.use('/contacts', authMid.checkAuth, contacts)
 
 app.post('/contacts/add', upload.single('contactPic'), (req, res) => {
     console.log("request body", req.body, req.file)

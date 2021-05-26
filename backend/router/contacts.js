@@ -1,6 +1,6 @@
 const contacts = require('express').Router();
 const contactsController = require('../controller/contacts');
-const testMid = require('../middleware/test');
+const auth = require('../middleware/auth');
 const logMid = require('../middleware/log')
 
 contacts.post('/new', logMid.logger, contactsController.newPost);

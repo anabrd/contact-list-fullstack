@@ -1,4 +1,6 @@
 const users = require('../model/users');
+const jwt = require('jsonwebtoken');
+const jwtSKey = process.env.JWT_S_KEY;
 
 exports.registerPost = (req, res) => {
 
@@ -25,7 +27,7 @@ exports.registerPost = (req, res) => {
 
 exports.loginPost = (req, res) => {
     let {email, pass} = req.body;
-    console.log(req.body)
+    console.log("req body in controller", req.body)
     users.findOne({email, pass}, (err, doc) => {
         if (err) {
             console.log(err);
@@ -36,7 +38,8 @@ exports.loginPost = (req, res) => {
         } else {
             console.log(doc)
             if (doc.pass == req.body.pass) {
-                res.send({status: "success", message:"User logged in successfully."})
+                const token = jwt.sign({id:doc._id}, jwtSKey, {expiresIn: '1d'})
+                res.send({status: "success", message:"User logged in successfully.", token})
             } else {
                 res.send({status: "failed", message:"There was an error. Please try again later."})
             }
