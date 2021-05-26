@@ -4,21 +4,7 @@ const contacts = require('./router/contacts');
 const connectDB = require('./config/db');
 const app = express();
 const port = process.env.PORT || 8080;
-const multer = require('multer');
-const contactsModel = require('./model/contacts');
 const auth = require('./router/auth');
-const authMid = require('./middleware/auth')
-
-const storage = multer.diskStorage({
-    destination: function(req, file, callback) {
-        callback(null, './public/images')
-    },
-    filename: function(req, file, callback) {
-        callback(null, Date.now() +'_'+ file.originalname)
-    }
-});
-
-const upload = multer({storage});
 
 connectDB();
 
@@ -35,31 +21,8 @@ app.use(allowCrossDomain);
 
 app.use(express.static(__dirname + '/public'));
 
-// Routes
-app.use('/contacts', contacts);
-
 app.listen(port, () => (console.log(`Server started to run on port ${port}.`)));
 
-app.use('/contacts', authMid.checkAuth, contacts)
-
-app.post('/contacts/add', upload.single('contactPic'), (req, res) => {
-    console.log("request body", req.body, req.file)
-    let newContact = new contactsModel({
-        fullName: req.body.fullName,
-        email: req.body.email,
-        phone: req.body.phone,
-        address: req.body.address,
-        contactPic: '/images/'+ req.file.filename
-    })
-    console.log("newContact", newContact)
-    newContact.save((err, doc)=>{
-        if (err) {
-            res.send({status:"failed", message:"Something went wrong."})
-        } else {
-            res.send({status:"success", message:"New contact added.", data: doc})
-        }
-    })
-}
-)
-
-app.use('/auth', auth)
+// Routes
+app.use('/auth', auth);
+app.use('/contacts', contacts)

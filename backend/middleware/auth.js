@@ -3,12 +3,12 @@ const jwtSKey = process.env.JWT_S_KEY;
 
 exports.checkAuth = (req, res, next) => {
     // Token is sent in the header
+    
     const token = req.header('x-auth-token');
-
+    console.log(token)
     if (!token) {
         res.status(401).send({status: "failed", message: "Absent token."})
-    }
-
+    } else {
     try {
         jwt.verify(token, jwtSKey, (fail, decodedPayLoad) => {
             if (fail) {
@@ -23,4 +23,5 @@ exports.checkAuth = (req, res, next) => {
     } catch (err) {
         console.log(err);
     }
+}
 }

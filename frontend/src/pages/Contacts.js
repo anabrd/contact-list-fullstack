@@ -4,16 +4,16 @@ import Card from '../components/Card'
 
 function Contacts() {
 
-const [form, setForm] = useState({fullName: '', email: '', phone: '', address:''});
-const [contacts, setContacts] = useState([{fullName: '', email: '', phone: '', address:''}]);
-const [message, setMessage] = useState(null);
-const [picture, setPicture] = useState();
+    const [form, setForm] = useState({fullName: '', email: '', phone: '', address:''});
+    const [contacts, setContacts] = useState([{fullName: '', email: '', phone: '', address:''}]);
+    const [message, setMessage] = useState(null);
+    const [picture, setPicture] = useState();
 
-useEffect(() => {
-    let storedContact = JSON.parse(localStorage.getItem("contact"));
-    if (storedContact) {
-        setForm(storedContact);
-    }}, []);
+    useEffect(() => {
+        let storedContact = JSON.parse(localStorage.getItem("contact"));
+        if (storedContact) {
+            setForm(storedContact);
+        }}, []);
 
     useEffect(() => {
     const url = 'http://localhost:8080/contacts/all';
@@ -22,111 +22,118 @@ useEffect(() => {
             'x-auth-token': localStorage.getItem('token')
         }
     }
+    console.log(url, options);
     fetch(url, options).then(data => data.json().then(
         contacts => setContacts(contacts)))
     }, []);
 
 
-const deleteContactHandler = (id) => {
-    // creating an url parametrically with the id
-    const url = 'http://localhost:8080/contacts/' + id;
-    const options = {
-    method: 'DELETE'
-    }
-
-    fetch(url, options).then(response => response.json().then(output => {
-
-    if (output.status == "success") {
-        setMessage(output.message);
-        setTimeout(()=> setMessage(null), 3000);
-        let newList = contacts.filter(contact => {
-        if (contact._id != output.data) {
-            return contact;
-        }
-        })
-        setContacts(newList);
-    } else {
-        alert("There was an error!");
-        setMessage(output.message);
-        setTimeout(()=> setMessage(null), 3000);
-        console.log(output.message);
-    }
-    }))
-    .catch(err => {
-    alert(err);
-    })
-}
-
-// function with bind method would be {deleteContactHandler.bind(this, contact._id)}
-const cards = contacts.map(contact => <Card 
-    key={contact._id} 
-    contact = {contact} 
-    deleteContact = {() => deleteContactHandler(contact._id)}
-    message = {message}
-    setMessage = {setMessage} />)
-
-const fillForm = (e, field) => {
-    let newForm = {...form}
-    newForm[field] = e.target.value;
-    setForm(newForm);
-    localStorage.setItem("contact", JSON.stringify(newForm));
-}
-
-// old addcontact form
-// const formSubmitHandler = (e) => {
-//   e.preventDefault();
-//   const url = 'http://localhost:8080/contacts/new';
-//   const options = {
-//     method: 'POST',
-//     headers: {
-//       'Content-Type': 'application/json'
-//     },
-//     body: JSON.stringify(form)
-//   }
-//   fetch(url, options)
-//   .then(data => data.json().then(output => {
-    
-//     if (output.status == "success") {
-//       setMessage(output.message);
-//       setTimeout(()=> setMessage(null), 3000);
-//       setContacts([...contacts, form])
-//     } else {
-//       setMessage(output.message);
-//       setTimeout(()=> setMessage(null), 3000);
-//       console.log(output.message);
-//     }}))
-// };
-
-const changePicture = (e) => {
-        setPicture(e.target.files[0]);
-}
-
-const addContact = (e) => {
-        e.preventDefault();
-    
-        const formData = new FormData();
-        formData.append('contactPic', picture);
-        formData.append('fullName', form.fullName);
-        formData.append('email', form.email);
-        formData.append('phone', form.phone);
-        formData.append('address', form.address);
-
-        const url = 'http://localhost:8080/contacts/add';
+    const deleteContactHandler = (id) => {
+        // creating an url parametrically with the id
+        const url = 'http://localhost:8080/contacts/' + id;
         const options = {
-        method: 'POST',
-        body: formData
+        method: 'DELETE',
+        headers: {
+                'x-auth-token': localStorage.getItem('token')
+            }
         }
 
-        fetch(url, options)
-        .then(data => data.json().then(output => {
-            if (output.status === "success") {
-                setMessage(output.message);
-                setTimeout(()=> setMessage(null), 3000);
-                setContacts([...contacts, output.data])
-            } else {
-                setMessage(output.message)
+        fetch(url, options).then(response => response.json().then(output => {
+
+        if (output.status == "success") {
+            setMessage(output.message);
+            setTimeout(()=> setMessage(null), 3000);
+            let newList = contacts.filter(contact => {
+            if (contact._id != output.data) {
+                return contact;
             }
+            })
+            setContacts(newList);
+        } else {
+            alert("There was an error!");
+            setMessage(output.message);
+            setTimeout(()=> setMessage(null), 3000);
+            console.log(output.message);
+        }
         }))
+        .catch(err => {
+        alert(err);
+        })
+    }
+
+    // function with bind method would be {deleteContactHandler.bind(this, contact._id)}
+    const cards = contacts.map(contact => <Card 
+        key={contact._id} 
+        contact = {contact} 
+        deleteContact = {() => deleteContactHandler(contact._id)}
+        message = {message}
+        setMessage = {setMessage} />)
+
+    const fillForm = (e, field) => {
+        let newForm = {...form}
+        newForm[field] = e.target.value;
+        setForm(newForm);
+        localStorage.setItem("contact", JSON.stringify(newForm));
+    }
+
+    // old addcontact form
+    // const formSubmitHandler = (e) => {
+    //   e.preventDefault();
+    //   const url = 'http://localhost:8080/contacts/new';
+    //   const options = {
+    //     method: 'POST',
+    //     headers: {
+    //       'Content-Type': 'application/json'
+    //     },
+    //     body: JSON.stringify(form)
+    //   }
+    //   fetch(url, options)
+    //   .then(data => data.json().then(output => {
+        
+    //     if (output.status == "success") {
+    //       setMessage(output.message);
+    //       setTimeout(()=> setMessage(null), 3000);
+    //       setContacts([...contacts, form])
+    //     } else {
+    //       setMessage(output.message);
+    //       setTimeout(()=> setMessage(null), 3000);
+    //       console.log(output.message);
+    //     }}))
+    // };
+
+    const changePicture = (e) => {
+            setPicture(e.target.files[0]);
+    }
+
+    const addContact = (e) => {
+            e.preventDefault();
+        
+            const formData = new FormData();
+            formData.append('contactPic', picture);
+            formData.append('fullName', form.fullName);
+            formData.append('email', form.email);
+            formData.append('phone', form.phone);
+            formData.append('address', form.address);
+
+            const url = 'http://localhost:8080/contacts/add';
+            const options = {
+            method: 'POST',
+            headers: {
+                'x-auth-token': localStorage.getItem('token')
+            },
+            body: formData
+            }
+
+            fetch(url, options)
+            .then(data => data.json().then(output => {
+                if (output.status === "success") {
+                    setMessage(output.message);
+                    setTimeout(()=> setMessage(null), 3000);
+                    setContacts([...contacts, output.data])
+                } else {
+                    setMessage(output.message)
+                }
+            }))
     }
 
 

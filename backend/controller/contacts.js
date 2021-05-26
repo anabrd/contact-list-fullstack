@@ -2,6 +2,7 @@ const contacts = require('../model/contacts');
 const logModel = require('../model/logs');
 require('mongoose').Promise = global.Promise;
 
+
 exports.newPost = async (req, res) =>
     {
         // add a new contact to db
@@ -105,4 +106,23 @@ exports.updateContact = async (req,res) => {
             // res.send({status: "success", message: "Contact updated successfully!"})
     //     }
     // })
+}
+
+exports.addContact = (req, res) => {
+    console.log("request body", req.body, req.file)
+    let newContact = new contacts({
+        fullName: req.body.fullName,
+        email: req.body.email,
+        phone: req.body.phone,
+        address: req.body.address,
+        contactPic: '/images/'+ req.file.filename
+    })
+    console.log("newContact", newContact)
+    newContact.save((err, doc)=>{
+        if (err) {
+            res.send({status:"failed", message:"Something went wrong."})
+        } else {
+            res.send({status:"success", message:"New contact added.", data: doc})
+        }
+    })
 }
