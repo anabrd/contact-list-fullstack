@@ -27,7 +27,7 @@ exports.newPost = async (req, res) =>
 
 exports.getAll = (req, res) => {
     // if you want the entrire collection you need to put in an empty query
-    contacts.find({}, (err, docs) => 
+    contacts.find({userId: req.userId}, (err, docs) => 
         {
             if (err) {
                 res.send(err);
@@ -111,6 +111,7 @@ exports.updateContact = async (req,res) => {
 exports.addContact = (req, res) => {
     console.log("request body", req.body, req.file)
     let newContact = new contacts({
+        userId: req.userId,
         fullName: req.body.fullName,
         email: req.body.email,
         phone: req.body.phone,

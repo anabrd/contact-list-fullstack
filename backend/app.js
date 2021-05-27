@@ -5,6 +5,7 @@ const connectDB = require('./config/db');
 const app = express();
 const port = process.env.PORT || 8080;
 const auth = require('./router/auth');
+const authMid = require('./middleware/auth');
 
 connectDB();
 
@@ -25,4 +26,4 @@ app.listen(port, () => (console.log(`Server started to run on port ${port}.`)));
 
 // Routes
 app.use('/auth', auth);
-app.use('/contacts', contacts)
+app.use('/contacts', authMid.checkAuth, contacts)

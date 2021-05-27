@@ -28,7 +28,8 @@ export default function() {
         .then(output => {
             if (output.status == "success") {
                 alert("Congrats, you're logged in!");
-                history.push("/contacts")
+                history.push("/contacts");
+                // Set the token in the localStorage once you get it
                 localStorage.setItem("token", output.token)
             } else {
                 alert(output.message)
@@ -69,7 +70,7 @@ export default function() {
                 <input type="password" placeholder="Password" autoComplete="on" required/>
                 <div className="buttons-wrapper">
                     <input id= "login" type="submit" className="btn btn-main" value="Login" ></input>
-                    <input id = "regiser" type="submit" className="btn btn-main" value="Register"></input>
+                    <input id = "register" type="submit" className="btn btn-main" value="Register"></input>
                 </div>
             </form>
         </div>

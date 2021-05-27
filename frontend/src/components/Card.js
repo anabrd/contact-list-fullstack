@@ -10,7 +10,7 @@ function Card({contact, deleteContact, message, setMessage}) {
     const [bgColor, setBgColor] = useState("white");
     const editedContact = {...contact};
     const [contactInfo, setContactInfo] = useState(contact);
-    const [imgPath, setImgPath] = useState("http://localhost:8080/" + contactInfo.contactPic);
+    const [imgPath, setImgPath] = useState( "http://localhost:8080/"+ contactInfo.contactPic);
 
     const editToggle = () => {
         setIsEditable(!isEditable);
