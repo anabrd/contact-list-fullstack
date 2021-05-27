@@ -30,10 +30,10 @@ exports.getAll = (req, res) => {
     contacts.find({userId: req.userId}, (err, docs) => 
         {
             if (err) {
-                res.send(err);
+                // 500 is the internal server error status code
+                res.status(500).send({status: "failed", message: err});
             } else {
-                console.log(docs);
-                res.send(docs);
+                res.send({status: "success", message: "Success", data: docs});
             }
         });
 }
@@ -73,7 +73,7 @@ exports.updateContact = async (req,res) => {
     contacts.findByIdAndUpdate(contact._id, contact, {upsert: true, runValidators: true}, (err,doc)=>{
         if (err) {
             console.log(err);
-            res.send({status:'failed', message: err});
+            res.send({status:'failed', message: "Could not update."});
         } else {
             console.log(doc);
             logModel.findByIdAndUpdate(req.logId, {preData: JSON.stringify(doc), postData: JSON.stringify(contact)}, (err) => {})
@@ -110,6 +110,7 @@ exports.updateContact = async (req,res) => {
 
 exports.addContact = (req, res) => {
     console.log("request body", req.body, req.file)
+    
     let newContact = new contacts({
         userId: req.userId,
         fullName: req.body.fullName,

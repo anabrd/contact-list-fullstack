@@ -1,12 +1,22 @@
 const users = require('../model/users');
 const jwt = require('jsonwebtoken');
 const jwtSKey = process.env.JWT_S_KEY;
+// bcrypt = encryption npm package
+const bcrypt = require('bcrypt');
 
-exports.registerPost = (req, res) => {
+exports.registerPost = async (req, res) => {
 
-    const newUser = new users(req.body);
+    let {email, pass} = req.body;
 
-    users.findOne({email: req.body.email}, (err, doc) => {
+    // hashing of the password
+    // This is async!
+    // First aargument is plain password, the second one amound of salt rounds
+    pass = await bcrypt.hash(pass, 10);
+
+    const newUser = new users({email, pass});
+
+    await users.findOne({email: req.body.email}, (err, doc) => {
+        console.log(pass)
         if (err) {
             console.log(err);
             res.send({status: "failed", message:"Something went wrong."})
@@ -26,9 +36,10 @@ exports.registerPost = (req, res) => {
 }
 
 exports.loginPost = (req, res) => {
+
     let {email, pass} = req.body;
-    console.log("req body in controller", req.body)
-    users.findOne({email, pass}, (err, doc) => {
+
+    users.findOne({email}, async (err, doc) => {
         if (err) {
             console.log(err);
             res.send({status: "failed", message: err})
@@ -36,8 +47,9 @@ exports.loginPost = (req, res) => {
         } else if (doc == null) {
             res.status(406).send({status: "failed", message:"Wrong credentials."})
         } else {
-            console.log(doc)
-            if (doc.pass == req.body.pass) {
+            // Since bcrypt uses different salt for hashing we have to use the compare method
+            const match = await bcrypt.compare(pass, doc.pass)
+            if (match) {
                 const token = jwt.sign({id:doc._id}, jwtSKey, {expiresIn: '1d'})
                 res.send({status: "success", message:"User logged in successfully.", token})
             } else {

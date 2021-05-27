@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import '../App.css';
 import Card from '../components/Card'
+import { useHistory } from 'react-router-dom'
 
 function Contacts() {
 
@@ -8,6 +9,15 @@ function Contacts() {
     const [contacts, setContacts] = useState([{fullName: '', email: '', phone: '', address:''}]);
     const [message, setMessage] = useState(null);
     const [picture, setPicture] = useState();
+    const headers = {'x-auth-token': localStorage.getItem('token')}
+
+    let history = useHistory();
+
+    useEffect(() => {
+        if (!localStorage.getItem('token')) {
+            history.push('/auth')
+        }
+    });
 
     useEffect(() => {
         let storedContact = JSON.parse(localStorage.getItem("contact"));
@@ -22,20 +32,22 @@ function Contacts() {
             'x-auth-token': localStorage.getItem('token')
         }
     }
-    console.log(url, options);
     fetch(url, options).then(data => data.json().then(
-        contacts => setContacts(contacts)))
+        output => {
+            if (output.status == 'success') {
+                setContacts(output.data)
+            } else {
+                setMessage(output.message)
+            }
+        }))
     }, []);
-
 
     const deleteContactHandler = (id) => {
         // creating an url parametrically with the id
         const url = 'http://localhost:8080/contacts/' + id;
         const options = {
         method: 'DELETE',
-        headers: {
-                'x-auth-token': localStorage.getItem('token')
-            }
+        headers
         }
 
         fetch(url, options).then(response => response.json().then(output => {
@@ -62,12 +74,17 @@ function Contacts() {
     }
 
     // function with bind method would be {deleteContactHandler.bind(this, contact._id)}
-    const cards = contacts.map(contact => <Card 
-        key={contact._id} 
+    let cards = [];
+    
+    if (typeof(contacts) == 'object' && contacts.length > 0) {
+        cards = contacts.map(contact => <Card 
+        key = {contact._id} 
         contact = {contact} 
         deleteContact = {() => deleteContactHandler(contact._id)}
         message = {message}
         setMessage = {setMessage} />)
+    }
+    
 
     const fillForm = (e, field) => {
         let newForm = {...form}
@@ -75,31 +92,6 @@ function Contacts() {
         setForm(newForm);
         localStorage.setItem("contact", JSON.stringify(newForm));
     }
-
-    // old addcontact form
-    // const formSubmitHandler = (e) => {
-    //   e.preventDefault();
-    //   const url = 'http://localhost:8080/contacts/new';
-    //   const options = {
-    //     method: 'POST',
-    //     headers: {
-    //       'Content-Type': 'application/json'
-    //     },
-    //     body: JSON.stringify(form)
-    //   }
-    //   fetch(url, options)
-    //   .then(data => data.json().then(output => {
-        
-    //     if (output.status == "success") {
-    //       setMessage(output.message);
-    //       setTimeout(()=> setMessage(null), 3000);
-    //       setContacts([...contacts, form])
-    //     } else {
-    //       setMessage(output.message);
-    //       setTimeout(()=> setMessage(null), 3000);
-    //       console.log(output.message);
-    //     }}))
-    // };
 
     const changePicture = (e) => {
             setPicture(e.target.files[0]);
@@ -118,9 +110,7 @@ function Contacts() {
             const url = 'http://localhost:8080/contacts/add';
             const options = {
             method: 'POST',
-            headers: {
-                'x-auth-token': localStorage.getItem('token')
-            },
+            headers,
             body: formData
             }
 
