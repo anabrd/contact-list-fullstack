@@ -100,6 +100,7 @@ function Contacts() {
     const addContact = (e) => {
             e.preventDefault();
         
+            // Form data method
             const formData = new FormData();
             formData.append('contactPic', picture);
             formData.append('fullName', form.fullName);
@@ -109,9 +110,11 @@ function Contacts() {
 
             const url = 'http://localhost:8080/contacts/add';
             const options = {
-            method: 'POST',
-            headers,
-            body: formData
+                method: 'POST',
+                headers : {
+                    'x-auth-token': localStorage.getItem('token')
+                },
+                body: formData
             }
 
             fetch(url, options)

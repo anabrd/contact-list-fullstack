@@ -41,11 +41,10 @@ exports.loginPost = (req, res) => {
 
     users.findOne({email}, async (err, doc) => {
         if (err) {
-            console.log(err);
             res.send({status: "failed", message: err})
         // This is if the record already exists
         } else if (doc == null) {
-            res.status(406).send({status: "failed", message:"Wrong credentials."})
+            res.status(406).send({status: "failed", message: "Wrong credentials."})
         } else {
             // Since bcrypt uses different salt for hashing we have to use the compare method
             const match = await bcrypt.compare(pass, doc.pass)

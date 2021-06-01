@@ -2,7 +2,6 @@ const mongoose = require('mongoose');
 
 // Schema for contact
 const contacts = new mongoose.Schema({
-    userId: String,
     fullName: String,
     email: {
         type: String,

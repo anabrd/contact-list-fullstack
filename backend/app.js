@@ -20,6 +20,7 @@ let allowCrossDomain = function(req, res, next) {
 
 app.use(allowCrossDomain);
 
+// This provides public access to the folfer specified in the static
 app.use(express.static(__dirname + '/public'));
 
 app.listen(port, () => (console.log(`Server started to run on port ${port}.`)));

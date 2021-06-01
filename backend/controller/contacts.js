@@ -1,33 +1,28 @@
 const contacts = require('../model/contacts');
 const logModel = require('../model/logs');
 require('mongoose').Promise = global.Promise;
+const multer = require('multer');
+// Path is a native node.js import
+const path = require('path');
+const fs = require('fs');
 
-
-exports.newPost = async (req, res) =>
-    {
-        // add a new contact to db
-        const newContact = new contacts(req.body);
-        console.log("log id from new contact", req.logId)
-        // Bulent's code
-        await newContact.save((err, docs) => {
-            if (err) {
-                res.send(err.errors);
-            } else {
-                res.send({status: "success", message:"New contact added", data: docs});
-                logModel.findByIdAndUpdate(req.logId, {postData: JSON.stringify(docs)}, {new:true}, (err, doc) => {
-                    if (err) {
-                        console.log(err)
-                    } else {
-                        console.log(doc)
-                    }
-                })
-            }
-        });
+const storage = multer.diskStorage({
+    destination: function(req, file, callback) {
+        callback(null, 'public/avatars')
+    },
+    filename: function(req, file, callback) {
+        // The timestamps will give a unique filename on the server
+        // Path.extname provides the extension of the original file
+        callback(null, 'a' + Date.now() + path.extname(file.originalname))
     }
+});
+
+// Connecting stirage settings to multer
+const upload = multer({storage: storage}).single('contactPic');
 
 exports.getAll = (req, res) => {
     // if you want the entrire collection you need to put in an empty query
-    contacts.find({userId: req.userId}, (err, docs) => 
+    contacts.find({/* userId: req.userId */}, (err, docs) => 
         {
             if (err) {
                 // 500 is the internal server error status code
@@ -58,6 +53,14 @@ exports.deleteContact = (req, res) => {
                     
                 }
             })
+
+                try {
+                    fs.unlinkSync('public/avatars/' + doc.contactPic);
+                    console.log("deleted")
+                } catch (err) {
+                    // handle the error
+                }
+
             res.send({
                 status: "success", 
                 message: `${doc.fullName} deleted.`,
@@ -66,18 +69,35 @@ exports.deleteContact = (req, res) => {
         }})
 }
 
-exports.updateContact = async (req,res) => {
-    const contact = req.body
-    console.log(req.logId, "in update")
+exports.updateContact = (req,res) => {
+
+    upload(req, res, async (err) => {
+        if (err) {
+            console.log({err})
+        }
+
+        const contact = {...req.body};
+        if (req.file) {
+            contact.contactPic = req.file.filename;
+        }
+
     // You have to add a runValidators object because otherwise the validation won't happen
     contacts.findByIdAndUpdate(contact._id, contact, {upsert: true, runValidators: true}, (err,doc)=>{
         if (err) {
             console.log(err);
             res.send({status:'failed', message: "Could not update."});
         } else {
+            if (contact.contactPic) {
+                try {
+                    fs.unlinkSync('public/avatars/' + doc.contactPic);
+                    console.log("deleted")
+                } catch (err) {
+                    // handle the error
+                }
+            }
             console.log(doc);
             logModel.findByIdAndUpdate(req.logId, {preData: JSON.stringify(doc), postData: JSON.stringify(contact)}, (err) => {})
-            res.send(({status:'success', message: 'Contact updated successfully'}));
+            res.send(({status:'success', message: 'Contact updated successfully', data: doc}));
         }
     });
 
@@ -106,25 +126,36 @@ exports.updateContact = async (req,res) => {
             // res.send({status: "success", message: "Contact updated successfully!"})
     //     }
     // })
-}
+        })
+};
 
 exports.addContact = (req, res) => {
-    console.log("request body", req.body, req.file)
-    
-    let newContact = new contacts({
-        userId: req.userId,
-        fullName: req.body.fullName,
-        email: req.body.email,
-        phone: req.body.phone,
-        address: req.body.address,
-        contactPic: '/images/'+ req.file.filename
-    })
-    console.log("newContact", newContact)
-    newContact.save((err, doc)=>{
+    console.log("request body", req.body);
+
+    // Have to make it async/await because it takes time to download/parse file
+    upload(req, res, async (err) => {
         if (err) {
-            res.send({status:"failed", message:"Something went wrong."})
-        } else {
-            res.send({status:"success", message:"New contact added.", data: doc})
+            console.log({err})
+        } 
+        
+        const {fullName, email, phone, address} = req.body;
+
+        let newContact = new contacts({fullName, email, phone, address});
+
+        if (req.file) {
+            newContact.contactPic = req.file.filename
         }
-    })
+
+        await newContact.save((err, doc) => {
+            console.log("new contact in save", newContact)
+            if (err) {
+                res.send({status:"failed", message:"Something went wrong."})
+            } else {
+                res.send({status:"success", message:"New contact added.", data: doc})
+            }
+        })
+    }
+    )
+
+    console.log("controller after multer", req.body, req.file)
 }

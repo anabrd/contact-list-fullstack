@@ -10,7 +10,7 @@ function Card({contact, deleteContact, message, setMessage}) {
     const [bgColor, setBgColor] = useState("white");
     const editedContact = {...contact};
     const [contactInfo, setContactInfo] = useState(contact);
-    const [imgPath, setImgPath] = useState( "http://localhost:8080/"+ contactInfo.contactPic);
+    const [imgPath, setImgPath] = useState(contact.contactPic);
 
     const editToggle = () => {
         setIsEditable(!isEditable);
@@ -23,7 +23,13 @@ function Card({contact, deleteContact, message, setMessage}) {
 
     const editCardHandler = (e) => {
         const id = e.target.getAttribute("data-id");
-        const info = e.target.innerText;
+        console.log(e.target.getAttribute("data-id"))
+        let info;
+        if (id == "contactPic") {
+            info = e.target.files[0];
+        } else {
+            info = e.target.innerText;
+        }
         editedContact[id] = info;
         const newContact = {...contactInfo};
         newContact[id] = info;
@@ -39,14 +45,24 @@ function Card({contact, deleteContact, message, setMessage}) {
     }
 
     const updateContactHandler = () => {
+
+        const formData = new FormData();
+        formData.append('_id', contactInfo._id);
+        formData.append('contactPic', contactInfo.contactPic);
+        formData.append('fullName', contactInfo.fullName);
+        formData.append('email', contactInfo.email);
+        formData.append('phone', contactInfo.phone);
+        formData.append('address', contactInfo.address);
+
+        console.log(contactInfo)
+
         const url = 'http://localhost:8080/contacts/update';
         const options = {
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json',
             'x-auth-token': localStorage.getItem('token')
         },
-        body: JSON.stringify(contactInfo)
+        body: formData
         }
 
         fetch(url, options)
@@ -54,7 +70,9 @@ function Card({contact, deleteContact, message, setMessage}) {
             if (output.status === "success") {
                 setIsEditable(false);
                 setMessage(output.message);
-                setBgColor("white")
+                setBgColor("white");
+                let newPath = output.data.contactPic;
+                setImgPath(newPath);
                 setTimeout(()=> setMessage(null), 3000);
             } else {
                 setBgColor("coral");
@@ -65,10 +83,8 @@ function Card({contact, deleteContact, message, setMessage}) {
 
     return (
         <div className={message ? "card card-animate" : "card"} style={{backgroundColor: bgColor}}>
-            <div 
-            className="image" style={{backgroundImage: `url(${imgPath})`, backgroundSize: "cover"}}>
-                {isEditable ? "↑" : null}
-            </div>
+            {isEditable ? <input type="file" data-id="contactPic" onChange={editCardHandler}/> : <div 
+            className="image" style={{backgroundImage: `url(http://localhost:8080/avatars/${imgPath})`, backgroundSize: "cover"}}></div>}
             <section className="card-content">
                 <div 
                 data-id="fullName"
