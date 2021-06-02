@@ -19,7 +19,8 @@ const contacts = new mongoose.Schema({
     },
     contactPic: {
         type: String
-    }
+    },
+    userId: String
 });
 
 // First contacts is the collection name, the second one is our constant

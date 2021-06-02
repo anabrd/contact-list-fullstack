@@ -22,7 +22,7 @@ const upload = multer({storage: storage}).single('contactPic');
 
 exports.getAll = (req, res) => {
     // if you want the entrire collection you need to put in an empty query
-    contacts.find({/* userId: req.userId */}, (err, docs) => 
+    contacts.find({userId: req.userId}, (err, docs) => 
         {
             if (err) {
                 // 500 is the internal server error status code
@@ -130,8 +130,6 @@ exports.updateContact = (req,res) => {
 };
 
 exports.addContact = (req, res) => {
-    console.log("request body", req.body);
-
     // Have to make it async/await because it takes time to download/parse file
     upload(req, res, async (err) => {
         if (err) {
@@ -140,7 +138,7 @@ exports.addContact = (req, res) => {
         
         const {fullName, email, phone, address} = req.body;
 
-        let newContact = new contacts({fullName, email, phone, address});
+        let newContact = new contacts({fullName, email, phone, address, userId: req.userId});
 
         if (req.file) {
             newContact.contactPic = req.file.filename
