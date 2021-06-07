@@ -6,10 +6,17 @@ const app = express();
 const port = process.env.PORT || 8080;
 const auth = require('./router/auth');
 const authMid = require('./middleware/auth');
+const publicViews = require('./router/publicViews');
+const publicRoutes = require('./router/public')
+const hbs = require('hbs');
 
 connectDB();
 
 app.use(express.json());
+
+app.engine('html', hbs.__express);
+app.set('view engine', 'hbs');
+hbs.registerPartials(__dirname + '/views/partials')
 
 let allowCrossDomain = function(req, res, next) {
     res.header('Access-Control-Allow-Origin', "*");
@@ -28,3 +35,5 @@ app.listen(port, () => (console.log(`Server started to run on port ${port}.`)));
 // Routes
 app.use('/auth', auth);
 app.use('/contacts', authMid.checkAuth, contacts)
+app.use('/pages', publicViews)
+app.use('/', publicRoutes)
