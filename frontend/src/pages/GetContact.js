@@ -6,24 +6,33 @@ function GetContact() {
     const submitHandler = (e) => {
         e.preventDefault();
 
-        let data = {
+        let data = new FormData();
 
-        };
+        data.append("fullName", e.target[0].value);
+        data.append("email", e.target[1].value);
+        data.append("phone", e.target[2].value);
+        data.append("message", e.target[3].value);
+        // data.append("message", e.target[4].files);
+        
+      /*   for (let i = 0 ; i < e.target[4].files.length ; i++) {
+            data.append("attachs",  e.target[4].files[i]);
+        }
+ */
+        Array.from(e.target[4].files).forEach(file => {
+            data.append("attachs", file)
+        })
+        
 
-        data.fullName = e.target[0].value;
-        data.email = e.target[1].value;
-        data.phone = e.target[2].value;
-        data.message = e.target[3].value;
+        console.log("object from entries", Object.fromEntries(data));
 
-        console.log(data)
+        for (const value of data.values()) {
+            console.log(value);
+        }
 
         let url = "http://localhost:8080/get-contact"
         let options = {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(data)
+            body: data
         }
 
         fetch(url, options)
@@ -46,6 +55,7 @@ function GetContact() {
                 <input type="email" placeholder="Email"></input>
                 <input type="tel" placeholder="Phone"></input>
                 <textarea placeholder="Message"></textarea>
+                <input type="file" multiple></input>
                 <button>Get Contact</button>
             </form>
         </div>
