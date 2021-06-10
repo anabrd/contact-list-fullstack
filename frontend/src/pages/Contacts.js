@@ -26,7 +26,7 @@ function Contacts() {
         }}, []);
 
     useEffect(() => {
-    const url = 'http://localhost:8080/contacts/all';
+    const url = 'https://my-contacts-mern-app.herokuapp.com/contacts/all';
     const options = {
         headers: {
             'x-auth-token': localStorage.getItem('token')
@@ -44,7 +44,7 @@ function Contacts() {
 
     const deleteContactHandler = (id) => {
         // creating an url parametrically with the id
-        const url = 'http://localhost:8080/contacts/' + id;
+        const url = 'https://my-contacts-mern-app.herokuapp.com/contacts/' + id;
         const options = {
         method: 'DELETE',
         headers
@@ -108,7 +108,7 @@ function Contacts() {
             formData.append('phone', form.phone);
             formData.append('address', form.address);
 
-            const url = 'http://localhost:8080/contacts/add';
+            const url = 'https://my-contacts-mern-app.herokuapp.com/contacts/add';
             const options = {
                 method: 'POST',
                 headers : {
