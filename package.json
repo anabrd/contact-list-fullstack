@@ -20,5 +20,7 @@
   },
   "homepage": "https://github.com/anabrd/contact-list-fullstack#readme",
   "devDependencies": {},
-  "dependencies": {}
+  "dependencies": {
+    "concurrently": "^6.2.0"
+  }
 }
