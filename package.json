@@ -19,7 +19,6 @@
     "url": "https://github.com/anabrd/contact-list-fullstack/issues"
   },
   "homepage": "https://github.com/anabrd/contact-list-fullstack#readme",
-  "devDependencies": {
-    "concurrently": "^6.2.0"
-  }
+  "devDependencies": {},
+  "dependencies": {}
 }
