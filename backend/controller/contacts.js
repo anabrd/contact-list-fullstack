@@ -54,12 +54,13 @@ exports.deleteContact = (req, res) => {
                 }
             })
 
-                try {
-                    fs.unlinkSync('public/avatars/' + doc.contactPic);
-                    console.log("deleted")
-                } catch (err) {
-                    // handle the error
-                }
+            try {
+                fs.unlinkSync('public/avatars/' + doc.contactPic);
+                console.log("deleted")
+            } catch (err) {
+                // handle the error
+                console.log(err);
+            }
 
             res.send({
                 status: "success", 
