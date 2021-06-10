@@ -14,7 +14,7 @@ export default function() {
 
         // LOGIN REQUEST
         if (e.nativeEvent.submitter.id == "login") {
-            let url = 'https://my-contacts-mern-app.herokuapp.com/auth/login';
+            let url = 'http://localhost:8080/auth/login';
             let options = {
                 method: 'POST',
                 headers: {
@@ -41,7 +41,7 @@ export default function() {
 
         e.preventDefault();
         console.log(data);
-        let url = 'https://my-contacts-mern-app.herokuapp.com/auth/register';
+        let url = 'http://localhost:8080/auth/register';
         let options = {
             method: 'POST',
             headers: {

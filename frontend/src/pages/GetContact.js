@@ -29,7 +29,7 @@ function GetContact() {
             console.log(value);
         }
 
-        let url = "http://localhost:8080/get-contact"
+        let url = "https://my-contacts-mern-app.herokuapp.com/get-contact"
         let options = {
             method: 'POST',
             body: data
